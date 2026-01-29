@@ -1,0 +1,28 @@
+<div class="bg-[#121212] md:rounded-lg h-full overflow-y-auto">
+  @if (currentSong(); as song) {
+    <header class="sticky top-0 bg-gradient-to-b from-red-800 to-[#121212] p-6 z-10">
+      <div class="flex flex-col md:flex-row items-center md:items-end text-center md:text-left space-x-0 md:space-x-6">
+        <img [src]="song.coverArt" alt="Album Cover" class="w-24 h-24 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-md shadow-2xl mb-4 md:mb-0">
+        <div class="flex flex-col">
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tighter">{{ song.title }}</h1>
+          <p class="text-lg mt-2 font-semibold">{{ song.artist }}</p>
+        </div>
+      </div>
+    </header>
+    <div class="p-8">
+      @if (song.lyrics) {
+        <p class="text-xl md:text-2xl lg:text-3xl font-bold leading-loose text-gray-300 whitespace-pre-line">
+          {{ song.lyrics }}
+        </p>
+      } @else {
+        <div class="flex items-center justify-center h-64">
+          <p class="text-2xl text-gray-500 text-center">No lyrics available for this song.</p>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="flex items-center justify-center h-full">
+      <p class="text-2xl text-gray-500 text-center">Play a song to see the lyrics.</p>
+    </div>
+  }
+</div>

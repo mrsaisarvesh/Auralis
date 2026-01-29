@@ -1,0 +1,47 @@
+<div class="bg-[#121212] rounded-lg h-full overflow-y-auto p-6">
+  <h1 class="text-3xl font-extrabold text-white tracking-tighter mb-6">Queue</h1>
+
+  <!-- Now Playing -->
+  <div class="mb-8">
+    <h2 class="text-lg font-bold text-gray-400 mb-2">Now Playing</h2>
+    @if (currentSong(); as song) {
+      <div class="flex items-center space-x-4 p-2 bg-[#282828] rounded-md">
+        <i class="fas fa-volume-up text-red-400 w-12 text-center"></i>
+        <img [src]="song.coverArt" alt="Song Cover" class="w-12 h-12 rounded-sm">
+        <div class="flex-grow">
+          <p class="font-semibold text-red-400">{{ song.title }}</p>
+          <p class="text-sm text-gray-400">{{ song.artist }}</p>
+        </div>
+        <p class="text-right text-gray-400">{{ song.duration || '0:00' }}</p>
+      </div>
+    } @else {
+      <p class="text-gray-500">Nothing is playing.</p>
+    }
+  </div>
+
+  <!-- Next Up -->
+  <div>
+    <h2 class="text-lg font-bold text-gray-400 mb-2">Next Up</h2>
+    @if (songQueue().length > 0) {
+      @for (song of songQueue(); track song.id; let i = $index) {
+        <div (click)="playFromQueue(song)" class="group flex items-center space-x-4 p-2 hover:bg-[#282828] rounded-md cursor-pointer">
+          <div class="text-center w-12">
+            <span class="group-hover:hidden">{{ i + 1 }}</span>
+            <i class="fas fa-play hidden group-hover:inline"></i>
+          </div>
+          <img [src]="song.coverArt" alt="Song Cover" class="w-12 h-12 rounded-sm">
+          <div class="flex-grow">
+            <p class="font-semibold">{{ song.title }}</p>
+            <p class="text-sm text-gray-400">{{ song.artist }}</p>
+          </div>
+           <button (click)="$event.stopPropagation(); removeFromQueue(song.id)" class="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity" title="Remove from queue">
+            <i class="fas fa-times"></i>
+          </button>
+          <p class="text-right text-gray-400 ml-4">{{ song.duration || '0:00' }}</p>
+        </div>
+      }
+    } @else {
+      <p class="text-gray-500">The queue is empty. Play a song to add more.</p>
+    }
+  </div>
+</div>

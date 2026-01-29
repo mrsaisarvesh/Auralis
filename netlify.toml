@@ -1,0 +1,31 @@
+# Netlify configuration file
+
+[build]
+  # This project is a no-build static site.
+  # The 'publish' directory is the root of the repository.
+  command = "echo 'No build required'"
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# The following redirect is a standard configuration for Single Page Applications (SPAs).
+# It ensures that any direct navigation to a route is handled by the client-side router.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Add some basic security headers for better production security.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Prevents the site from being rendered in an iframe (clickjacking protection)
+    X-Frame-Options = "DENY"
+    # Enables the XSS filter in modern browsers
+    X-XSS-Protection = "1; mode=block"
+    # Prevents browsers from MIME-sniffing the content-type
+    X-Content-Type-Options = "nosniff"
+    # Controls how much referrer information is sent
+    Referrer-Policy = "strict-origin-when-cross-origin"

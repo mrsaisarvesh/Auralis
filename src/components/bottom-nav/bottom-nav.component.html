@@ -1,0 +1,29 @@
+<div class="bg-[#181818] border-t border-gray-800 md:hidden fixed bottom-0 w-full z-30">
+  <nav class="flex justify-around items-center h-16">
+    <a routerLink="/home" 
+       routerLinkActive="text-red-400" 
+       [routerLinkActiveOptions]="{exact: true}" 
+       class="flex flex-col items-center justify-center text-gray-400 hover:text-white w-full transition-colors duration-200">
+      <i class="fas fa-home text-xl"></i>
+      <span class="text-xs mt-1">Home</span>
+    </a>
+    <a routerLink="/search" 
+       routerLinkActive="text-red-400" 
+       class="flex flex-col items-center justify-center text-gray-400 hover:text-white w-full transition-colors duration-200">
+      <i class="fas fa-search text-xl"></i>
+      <span class="text-xs mt-1">Search</span>
+    </a>
+    <a routerLink="/ai-playlist" 
+       routerLinkActive="text-red-400" 
+       class="flex flex-col items-center justify-center text-gray-400 hover:text-white w-full transition-colors duration-200">
+      <i class="fas fa-magic text-xl"></i>
+      <span class="text-xs mt-1">AI</span>
+    </a>
+    <a routerLink="/history" 
+       routerLinkActive="text-red-400" 
+       class="flex flex-col items-center justify-center text-gray-400 hover:text-white w-full transition-colors duration-200">
+      <i class="fas fa-history text-xl"></i>
+      <span class="text-xs mt-1">History</span>
+    </a>
+  </nav>
+</div>

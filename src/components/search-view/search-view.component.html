@@ -1,0 +1,109 @@
+<div class="bg-[#121212] rounded-lg h-full overflow-y-auto p-6">
+  <header class="sticky top-0 bg-[#121212] pt-2 pb-4 z-10">
+    <div class="relative w-full md:w-1/2 lg:w-1/3">
+      <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+      <input 
+        type="text" 
+        placeholder="What do you want to listen to?"
+        [value]="searchTerm()"
+        (input)="onSearch($event)"
+        class="bg-[#282828] text-white rounded-full pl-12 pr-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-white text-md">
+    </div>
+  </header>
+
+  <div class="mt-6">
+    @if (isSearching()) {
+      <div class="flex items-center justify-center h-64">
+        <i class="fas fa-spinner fa-spin text-4xl text-gray-500"></i>
+      </div>
+    } @else {
+      @if (searchTerm() === '') {
+        <div class="flex items-center justify-center h-64">
+          <p class="text-2xl text-gray-500">Search for your favorite songs, artists, and albums.</p>
+        </div>
+      } @else if (searchResults().length === 0) {
+        <div class="flex items-center justify-center h-64">
+          <p class="text-2xl text-gray-500">No results found for "{{ searchTerm() }}".</p>
+        </div>
+      } @else {
+        <h2 class="text-2xl font-bold text-white mb-4">Results</h2>
+        <table class="w-full text-left">
+          <tbody>
+            @for (song of searchResults(); track song.id) {
+              <tr (click)="playSong(song)" class="group hover:bg-[#282828] rounded-md cursor-pointer">
+                <td class="p-2 text-center w-12">
+                   @if (currentSong()?.id === song.id && isPlaying()) {
+                    <i class="fas fa-volume-up text-red-400"></i>
+                  } @else {
+                    <i class="fas fa-play hidden group-hover:inline"></i>
+                  }
+                </td>
+                <td class="p-2 flex items-center space-x-4">
+                  <img [src]="song.coverArt" alt="Song Cover" class="w-10 h-10 rounded-sm">
+                  <div>
+                    <p class="font-semibold" [class.text-red-400]="currentSong()?.id === song.id">{{ song.title }}</p>
+                    <p class="text-sm text-gray-400">{{ song.artist }}</p>
+                  </div>
+                </td>
+                <td class="p-2 hidden md:table-cell">
+                   <button (click)="$event.stopPropagation(); selectAlbum(song.album, song.artist)" class="hover:underline">
+                    {{ song.album }}
+                  </button>
+                </td>
+                 <td class="p-2 text-center w-16">
+                  <button (click)="toggleLike(song.id, $event)" class="w-8 h-8">
+                    <i class="fa-heart" [class]="song.isLiked ? 'fa-solid text-red-500' : 'fa-regular text-gray-400 group-hover:text-white'"></i>
+                  </button>
+                </td>
+                <td class="p-2 text-right text-gray-400">{{ song.duration || '0:00' }}</td>
+                <td class="p-2 text-center w-12 relative">
+                  <button (click)="toggleMenu(song.id, $event)" class="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 p-2">
+                    <i class="fas fa-ellipsis-h"></i>
+                  </button>
+                  @if (activeMenuSongId() === song.id) {
+                    <div (click)="$event.stopPropagation()" class="absolute right-0 top-full mt-2 bg-[#282828] rounded-md shadow-lg z-20 w-56 text-left py-1 text-sm">
+                      <button (click)="setAsRingtone(song, $event)" class="w-full text-left px-4 py-2 flex items-center space-x-3 text-gray-300 hover:bg-[#3e3e3e]">
+                        <i class="fas fa-bell w-4 text-center"></i>
+                        <span>Set as Ringtone</span>
+                      </button>
+                      <div class="relative">
+                        <button (click)="toggleShareMenu(song.id, $event)" class="w-full text-left px-4 py-2 flex items-center justify-between text-gray-300 hover:bg-[#3e3e3e]">
+                          <div class="flex items-center space-x-3">
+                            <i class="fas fa-share-alt w-4 text-center"></i>
+                            <span>Share</span>
+                          </div>
+                          <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                        @if (activeShareMenuSongId() === song.id) {
+                          <div class="absolute left-full top-0 ml-1 bg-[#282828] rounded-md shadow-lg z-30 w-56 py-1">
+                            <button (click)="copySongLink(song, $event)" class="w-full text-left px-4 py-2 flex items-center space-x-3 text-gray-300 hover:bg-[#3e3e3e]">
+                              <i class="fas fa-link w-4 text-center"></i>
+                              <span>Copy Song Link</span>
+                            </button>
+                            <button class="w-full text-left px-4 py-2 flex items-center space-x-3 text-gray-500 cursor-not-allowed">
+                              <i class="fab fa-twitter w-4 text-center"></i>
+                              <span>Share to X</span>
+                            </button>
+                          </div>
+                        }
+                      </div>
+                      <div class="border-t border-gray-600 my-1"></div>
+                      <div class="px-4 pt-2 pb-1 text-xs text-gray-400">Add to playlist</div>
+                      <div class="max-h-32 overflow-y-auto">
+                        @for (playlist of userPlaylists(); track playlist.id) {
+                          <button (click)="addSongToPlaylist(song, playlist.id, $event)" class="w-full text-left px-4 py-2 text-gray-300 hover:bg-[#3e3e3e]">
+                            {{ playlist.name }}
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+</div>

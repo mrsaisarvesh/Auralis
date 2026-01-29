@@ -1,0 +1,102 @@
+<div class="bg-[#181818] p-4 flex items-center justify-between md:rounded-lg border-t md:border-t-0 border-gray-800">
+  <!-- Current Song Info -->
+  <div class="flex items-center space-x-2 md:space-x-4 flex-1 md:flex-none md:w-1/4 min-w-0">
+    @if (currentSong(); as song) {
+      <img [src]="song.coverArt" alt="Album Art" class="w-12 h-12 md:w-14 md:h-14 rounded-md">
+      <div class="min-w-0">
+        <p class="font-semibold text-sm md:text-base text-white truncate">{{ song.title }}</p>
+        <p class="text-xs md:text-sm text-gray-400 truncate">{{ song.artist }}</p>
+      </div>
+       <button (click)="toggleLike()" class="text-gray-400 hover:text-white ml-2 p-2">
+         <i class="fa-heart text-lg" [class]="song.isLiked ? 'fa-solid text-red-500' : 'fa-regular'"></i>
+      </button>
+    } @else {
+       <div class="w-12 h-12 md:w-14 md:h-14 rounded-md bg-gray-800 flex items-center justify-center">
+         <i class="fas fa-music text-gray-500 text-2xl"></i>
+       </div>
+       <div>
+         <p class="font-semibold text-white">-</p>
+         <p class="text-sm text-gray-400">-</p>
+       </div>
+    }
+  </div>
+
+  <!-- Player Controls -->
+  <div class="flex-none md:w-1/2 flex flex-col items-center px-4">
+    <div class="flex items-center space-x-6">
+       <button (click)="musicService.toggleShuffle()" 
+              [class]="isShuffling() ? 'text-red-500' : 'text-gray-400 hover:text-white'"
+              class="transition-colors duration-200">
+        <i class="fas fa-shuffle text-lg md:text-xl"></i>
+      </button>
+      <button (click)="musicService.previousSong()" class="text-gray-400 hover:text-white transition-colors duration-200">
+        <i class="fas fa-backward-step text-lg md:text-xl"></i>
+      </button>
+      <button (click)="musicService.togglePlayPause()"
+        class="bg-white text-black rounded-full w-10 h-10 flex items-center justify-center focus:outline-none transform hover:scale-105 active:scale-90 transition-transform duration-200">
+        <i [class]="'fas text-lg ' + (isPlaying() ? 'fa-pause' : 'fa-play')"></i>
+      </button>
+      <button (click)="musicService.nextSong()" class="text-gray-400 hover:text-white transition-colors duration-200">
+        <i class="fas fa-forward-step text-lg md:text-xl"></i>
+      </button>
+      <button (click)="musicService.toggleRepeatMode()"
+              class="relative transition-colors duration-200"
+              [class]="repeatMode() !== 'off' ? 'text-red-500' : 'text-gray-400 hover:text-white'">
+        <i class="fas fa-repeat text-lg md:text-xl"></i>
+        @if (repeatMode() === 'one') {
+          <span class="absolute w-1 h-1 bg-current rounded-full" style="bottom: -4px; left: 50%; transform: translateX(-50%);"></span>
+        }
+      </button>
+    </div>
+    <div class="hidden md:flex items-center space-x-2 w-full mt-2">
+      <span class="text-xs text-gray-400">{{ currentTime() }}</span>
+      <div class="w-full bg-gray-600 rounded-full h-1 group">
+        <input 
+          type="range" 
+          min="0" 
+          max="100" 
+          [value]="progress()" 
+          (input)="onProgressChange($event)"
+          class="w-full h-1 bg-transparent cursor-pointer appearance-none group-hover:[&::-webkit-slider-thumb]:bg-red-500 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-transparent"
+        >
+        <div class="bg-white group-hover:bg-red-500 h-1 rounded-full -mt-1 pointer-events-none transition-all duration-100 ease-linear" [style.width.%]="progress()"></div>
+      </div>
+      <span class="text-xs text-gray-400">{{ duration() }}</span>
+    </div>
+  </div>
+
+  <!-- Volume Controls -->
+  <div class="flex items-center space-x-2 md:space-x-4 flex-1 md:flex-none md:w-1/4 justify-end">
+     <a routerLink="/lyrics" routerLinkActive="text-red-500" #rlaLyrics="routerLinkActive"
+            [class.text-gray-400]="!rlaLyrics.isActive"
+            class="hover:text-white transition-colors duration-200" title="Lyrics">
+        <i class="fas fa-microphone"></i>
+     </a>
+     <a routerLink="/queue" routerLinkActive="text-red-500" #rlaQueue="routerLinkActive"
+            [class.text-gray-400]="!rlaQueue.isActive"
+            class="hover:text-white transition-colors duration-200" title="Queue">
+      <i class="fas fa-list-ol"></i>
+    </a>
+    <button (click)="musicService.toggleMute()" class="text-gray-400 hover:text-white">
+      @if (isMuted() || volume() === 0) {
+        <i class="fas fa-volume-mute"></i>
+      } @else if (volume() < 0.5) {
+        <i class="fas fa-volume-down"></i>
+      } @else {
+        <i class="fas fa-volume-up"></i>
+      }
+    </button>
+    <div class="w-24 bg-gray-600 rounded-full h-1 group hidden md:flex">
+        <input 
+            type="range" 
+            min="0" 
+            max="1" 
+            step="0.01" 
+            [value]="isMuted() ? 0 : volume()" 
+            (input)="onVolumeChange($event)"
+            class="w-full h-1 bg-transparent cursor-pointer appearance-none group-hover:[&::-webkit-slider-thumb]:bg-red-500 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-transparent"
+        >
+        <div class="bg-white group-hover:bg-red-500 h-1 rounded-full -mt-1 pointer-events-none transition-all duration-100 ease-linear" [style.width.%]="(isMuted() ? 0 : volume()) * 100"></div>
+    </div>
+  </div>
+</div>

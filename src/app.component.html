@@ -1,0 +1,23 @@
+<div class="h-dvh flex flex-col bg-black">
+  <div class="flex-grow flex md:p-2 md:gap-2 overflow-hidden">
+    <!-- Sidebar (Desktop) -->
+    <aside class="w-64 lg:w-80 flex-shrink-0 hidden md:flex flex-col">
+      <app-sidebar></app-sidebar>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow min-w-0 overflow-y-auto pb-32 md:pb-0">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Player Controls (fixed on mobile, part of layout on desktop) -->
+  <footer class="fixed bottom-16 md:bottom-0 md:relative w-full z-40 md:p-2 md:pt-0">
+    <app-player-controls></app-player-controls>
+  </footer>
+
+  <!-- Bottom Nav (Mobile Only) -->
+  <app-bottom-nav></app-bottom-nav>
+
+  <app-toast></app-toast>
+</div>

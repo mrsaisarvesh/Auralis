@@ -1,0 +1,58 @@
+<div class="bg-[#121212] p-6 rounded-lg mb-2">
+  <a routerLink="/home" class="flex items-center space-x-3 mb-8 text-white">
+    <app-logo></app-logo>
+    <span class="font-bold text-2xl tracking-tight">Auralis</span>
+  </a>
+  <nav class="space-y-4">
+    <a routerLink="/home" routerLinkActive="text-white" #rlaHome="routerLinkActive"
+       [class.text-gray-400]="!rlaHome.isActive"
+       class="flex items-center space-x-4 w-full font-bold text-lg transition-colors duration-200 hover:text-white">
+      <i class="fas fa-home text-2xl"></i>
+      <span>Home</span>
+    </a>
+    <a routerLink="/search" routerLinkActive="text-white" #rlaSearch="routerLinkActive"
+       [class.text-gray-400]="!rlaSearch.isActive"
+       class="flex items-center space-x-4 w-full font-bold text-lg transition-colors duration-200 hover:text-white">
+      <i class="fas fa-search text-2xl"></i>
+      <span>Search</span>
+    </a>
+    <a routerLink="/ai-playlist" routerLinkActive="text-white" #rlaAi="routerLinkActive"
+       [class.text-gray-400]="!rlaAi.isActive"
+       class="flex items-center space-x-4 w-full font-bold text-lg transition-colors duration-200 hover:text-white">
+      <i class="fas fa-magic text-2xl"></i>
+      <span>AI Playlist</span>
+    </a>
+    <a routerLink="/history" routerLinkActive="text-white" #rlaHistory="routerLinkActive"
+       [class.text-gray-400]="!rlaHistory.isActive"
+       class="flex items-center space-x-4 w-full font-bold text-lg transition-colors duration-200 hover:text-white">
+      <i class="fas fa-history text-2xl"></i>
+      <span>History</span>
+    </a>
+  </nav>
+</div>
+<div class="bg-[#121212] p-2 rounded-lg flex-grow flex flex-col">
+  <div class="flex items-center justify-between p-4">
+    <button class="flex items-center space-x-4 text-gray-400 hover:text-white font-bold text-lg transition-colors duration-200">
+      <i class="fas fa-stream text-2xl"></i>
+      <span>Your Library</span>
+    </button>
+    <button (click)="openFilePicker()" class="text-gray-400 hover:text-white transition-colors duration-200" title="Add local files">
+      <i class="fas fa-plus text-xl"></i>
+    </button>
+    <input type="file" #fileInput class="hidden" multiple accept="audio/*" (change)="onFileSelected($event)">
+  </div>
+  <div class="flex-grow overflow-y-auto pr-2">
+    @for (playlist of playlists(); track playlist.id) {
+      <div 
+        (click)="selectPlaylist(playlist)"
+        class="flex items-center space-x-4 p-2 rounded-md hover:bg-[#282828] cursor-pointer transition-colors duration-200"
+        [class.bg-[#282828]]="viewedPlaylist()?.id === playlist.id && isHomeViewActive()">
+        <img [src]="playlist.coverArt" alt="Playlist Cover" class="w-12 h-12 rounded-md">
+        <div>
+          <p class="font-semibold text-white truncate">{{ playlist.name }}</p>
+          <p class="text-sm text-gray-400">Playlist</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>
