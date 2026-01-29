@@ -476,6 +476,8 @@ Underneath these vast, desert skies`, isLiked: false },
       return newHistory.slice(0, 50);
     });
 
+    this.audioElement.pause(); // Fix: Prevent interruption error
+
     this.playbackContext.set(context);
     this._buildQueue(context, song);
     
@@ -492,7 +494,10 @@ Underneath these vast, desert skies`, isLiked: false },
        }
        return;
     }
-    this.audioElement.play().then(() => this.isPlaying.set(true)).catch(e => console.error("Playback failed", e));
+    this.audioElement.play().then(() => this.isPlaying.set(true)).catch(e => {
+      console.error("Playback failed", e)
+      this.isPlaying.set(false); // Fix: Ensure state is correct on failure
+    });
   }
 
   pause() {

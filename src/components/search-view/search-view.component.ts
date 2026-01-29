@@ -1,8 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { MusicService } from '../../services/music.service';
 import { Song } from '../../types/music.types';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -13,7 +11,7 @@ import { ToastService } from '../../services/toast.service';
     '(document:click)': 'onDocumentClick()',
   },
 })
-export class SearchViewComponent implements OnInit, OnDestroy {
+export class SearchViewComponent {
   musicService = inject(MusicService);
   toastService = inject(ToastService);
   
@@ -23,26 +21,12 @@ export class SearchViewComponent implements OnInit, OnDestroy {
   isPlaying = this.musicService.isPlaying;
   isSearching = this.musicService.isSearching;
 
-  private searchTerms = new Subject<string>();
-  private searchSubscription!: Subscription;
+  private debounceTimer: any;
 
   activeMenuSongId = signal<number | null>(null);
   activeShareMenuSongId = signal<number | null>(null);
   
   userPlaylists = computed(() => this.musicService.playlists().filter(p => p.id > 0));
-
-  ngOnInit() {
-    this.searchSubscription = this.searchTerms.pipe(
-      debounceTime(400),
-      distinctUntilChanged()
-    ).subscribe(term => {
-      this.musicService.searchAllSongs(term);
-    });
-  }
-
-  ngOnDestroy() {
-    this.searchSubscription.unsubscribe();
-  }
 
   onDocumentClick(): void {
     this.activeMenuSongId.set(null);
@@ -51,7 +35,12 @@ export class SearchViewComponent implements OnInit, OnDestroy {
 
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
-    this.searchTerms.next(input.value);
+    const term = input.value;
+
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => {
+      this.musicService.searchAllSongs(term);
+    }, 300);
   }
 
   playSong(song: Song) {

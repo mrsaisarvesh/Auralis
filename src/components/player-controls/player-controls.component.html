@@ -2,21 +2,26 @@
   <!-- Current Song Info -->
   <div class="flex items-center space-x-2 md:space-x-4 flex-1 md:flex-none md:w-1/4 min-w-0">
     @if (currentSong(); as song) {
-      <img [src]="song.coverArt" alt="Album Art" class="w-12 h-12 md:w-14 md:h-14 rounded-md">
-      <div class="min-w-0">
-        <p class="font-semibold text-sm md:text-base text-white truncate">{{ song.title }}</p>
-        <p class="text-xs md:text-sm text-gray-400 truncate">{{ song.artist }}</p>
+      <div class="flex items-center space-x-2 md:space-x-4 min-w-0 animate-fade-in w-full">
+        <img [src]="song.coverArt" alt="Album Art" class="w-12 h-12 md:w-14 md:h-14 rounded-md flex-shrink-0">
+        <div class="min-w-0 flex-grow">
+          <p class="font-semibold text-sm md:text-base text-white truncate">{{ song.title }}</p>
+          <p class="text-xs md:text-sm text-gray-400 truncate">{{ song.artist }}</p>
+        </div>
+         <button (click)="toggleLike()" class="text-gray-400 hover:text-white ml-2 p-2 transition-transform duration-150 transform hover:scale-110 active:scale-100 flex-shrink-0">
+           <i class="fa-heart text-lg [transition:color_0.2s_ease-out]" [class]="song.isLiked ? 'fa-solid text-red-500' : 'fa-regular'"></i>
+        </button>
       </div>
-       <button (click)="toggleLike()" class="text-gray-400 hover:text-white ml-2 p-2">
-         <i class="fa-heart text-lg" [class]="song.isLiked ? 'fa-solid text-red-500' : 'fa-regular'"></i>
-      </button>
     } @else {
-       <div class="w-12 h-12 md:w-14 md:h-14 rounded-md bg-gray-800 flex items-center justify-center">
-         <i class="fas fa-music text-gray-500 text-2xl"></i>
-       </div>
-       <div>
-         <p class="font-semibold text-white">-</p>
-         <p class="text-sm text-gray-400">-</p>
+       <div class="flex items-center space-x-2 md:space-x-4 min-w-0 w-full">
+         <div class="w-12 h-12 md:w-14 md:h-14 rounded-md bg-gray-800 flex items-center justify-center flex-shrink-0">
+           <i class="fas fa-music text-gray-500 text-2xl"></i>
+         </div>
+         <div class="min-w-0 flex-grow">
+           <p class="font-semibold text-white truncate">-</p>
+           <p class="text-sm text-gray-400 truncate">-</p>
+         </div>
+         <div class="w-9 h-9 ml-2 p-2 flex-shrink-0"></div> <!-- Placeholder for like button -->
        </div>
     }
   </div>
@@ -33,7 +38,7 @@
         <i class="fas fa-backward-step text-lg md:text-xl"></i>
       </button>
       <button (click)="musicService.togglePlayPause()"
-        class="bg-white text-black rounded-full w-10 h-10 flex items-center justify-center focus:outline-none transform hover:scale-105 active:scale-90 transition-transform duration-200">
+        class="bg-white text-black rounded-full w-10 h-10 flex items-center justify-center focus:outline-none transform hover:scale-110 active:scale-95 transition-transform duration-150 ease-out">
         <i [class]="'fas text-lg ' + (isPlaying() ? 'fa-pause' : 'fa-play')"></i>
       </button>
       <button (click)="musicService.nextSong()" class="text-gray-400 hover:text-white transition-colors duration-200">
