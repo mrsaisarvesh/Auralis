@@ -1,18 +1,19 @@
 import { Injectable, signal, computed, effect, WritableSignal, untracked, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Song, Playlist, Album } from '../types/music.types';
 import { ToastService } from './toast.service';
-import { GoogleGenAI, Type } from '@google/genai';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MusicService {
+  private http = inject(HttpClient);
   private audioElement: HTMLAudioElement = new Audio();
   private toastService = inject(ToastService);
   private router = inject(Router);
   private readonly LIBRARY_PLAYLIST_ID = 0;
-  private ai: GoogleGenAI | null = null;
 
   // Mock Data
   private readonly MOCK_PLAYLISTS: Playlist[] = [
@@ -99,12 +100,6 @@ Underneath these vast, desert skies`, isLiked: false },
   private allSongs = computed(() => this.playlists().filter(p => p.id !== this.LIBRARY_PLAYLIST_ID).flatMap(p => p.songs));
   
   constructor() {
-    try {
-      this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    } catch(e) {
-      console.error("Failed to initialize GoogleGenAI", e);
-    }
-    
     const allMockSongs = this.MOCK_PLAYLISTS.flatMap(p => p.songs);
     const initialPlaylists: Playlist[] = [
       {
@@ -156,39 +151,13 @@ Underneath these vast, desert skies`, isLiked: false },
   }
 
   async generateAiPlaylist(prompt: string) {
-    if (!this.ai) {
-      this.toastService.showToast('AI service is not available.');
-      return;
-    }
-
     try {
-      const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `Create a playlist of 8 songs for the following prompt: "${prompt}". Provide only song titles and artist names.`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              songs: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    title: { type: Type.STRING },
-                    artist: { type: Type.STRING },
-                  },
-                  required: ["title", "artist"],
-                },
-              },
-            },
-            required: ["songs"],
-          },
-        },
-      });
+      const jsonResponse = await firstValueFrom(
+        this.http.post<{ songs: { title: string; artist: string }[] }>('/.netlify/functions/generate-playlist', { prompt })
+      );
 
-      const jsonResponse = JSON.parse(response.text.trim());
-      const aiSongs: { title: string; artist: string }[] = jsonResponse.songs;
+      // Fix: Cast the response to the expected type to resolve compilation error where jsonResponse was treated as 'unknown'.
+      const aiSongs = (jsonResponse as { songs: { title: string; artist: string }[] }).songs;
 
       if (!aiSongs || aiSongs.length === 0) {
         this.toastService.showToast('Could not generate a playlist from that prompt.');
